@@ -100,6 +100,12 @@ namespace Solidify
                         VisitContainer(node);
                         builder.Append(" </sup>");
                         break;
+                    
+                    case "sub":
+                        builder.Append(" <sub>");
+                        VisitContainer(node);
+                        builder.Append(" </sub>");
+                        break;
 
                     case "img":
                         builder.Append($"![{node.GetAttributeValue("alt", "")}]({node.GetAttributeValue("src", "")})");
@@ -113,6 +119,7 @@ namespace Solidify
 
                     case "span":
                     case "li":
+                    case "pre":
                         VisitContainer(node);
                         break;
 
@@ -153,9 +160,31 @@ namespace Solidify
 
                             VisitElement(childNode);
                             builder.Append('\n');
+                            count += 1;
                         }
 
                         builder.Append("\n");
+                        break;
+                    
+                    case "table":
+                        builder.Append("\n");
+                        builder.Append(node.OuterHtml);
+                        builder.Append("\n");
+                        break;
+
+                    case "code":
+                        if (node.OuterLength < 50)
+                        {
+                            builder.Append(" `");
+                            VisitContainer(node);
+                            builder.Append("` ");
+                        }
+                        else
+                        {
+                            builder.Append("\n```");
+                            VisitContainer(node);
+                            builder.Append("```\n");
+                        }
                         break;
 
                     default:
