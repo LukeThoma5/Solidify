@@ -17,6 +17,16 @@ namespace Solidify
                 }).ToArray());
         }
 
+        public static string GetFileName(string title, string fileName)
+        {
+            if (fileName.Contains("_answ") || fileName.Contains("_disc") || fileName.Contains("_tran"))
+            {
+                return fileName.Replace("html", "md");
+            }
+
+            return title + ".md";
+        }
+
         public static void EnsureCreated(DirectoryInfo info)
         {
             if (!info.Exists)

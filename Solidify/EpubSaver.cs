@@ -36,7 +36,7 @@ namespace Solidify
             }
         }
 
-        private static string ConvertHtmlToMarkdown(HtmlDocument document)
+        private static string ConvertHtmlToMarkdown(HtmlDocument document, ZipArchiveEntry entry)
         {
             var builder = new StringBuilder();
 
@@ -94,6 +94,10 @@ namespace Solidify
                     case "div":
                         VisitContainer(node);
                         break;
+                    
+                    case "br":
+                        builder.Append('\n');
+                        break;
 
                     case "sup":
                         builder.Append(" <sup>");
@@ -114,7 +118,14 @@ namespace Solidify
                     case "a":
                         builder.Append(" [");
                         VisitContainer(node);
-                        builder.Append($"]({node.GetAttributeValue("href", "")})");
+                        var reference = node.GetAttributeValue("href", "");
+
+                        if (entry.Archive.Entries.Any(e => string.Equals(e.Name, reference)))
+                        {
+                            reference = Helpers.GetFileName("bug", reference);
+                        }
+                        
+                        builder.Append($"]({reference})");
                         break;
 
                     case "span":
@@ -214,10 +225,10 @@ namespace Solidify
             document.LoadHtml(content);
 
             var title = document.DocumentNode.SelectSingleNode("//title");
-            var markdown = ConvertHtmlToMarkdown(document);
+            var markdown = ConvertHtmlToMarkdown(document, page);
 
             await using var fs = new FileStream(
-                saveRoot.FullName + $"/{Helpers.CreatePathSafeName(title.InnerText)}.md",
+                saveRoot.FullName + $"/{Helpers.GetFileName(title.InnerText, page.Name)}",
                 FileMode.OpenOrCreate);
             await fs.WriteAsync(Encoding.UTF8.GetBytes(markdown));
             await fs.FlushAsync();
