@@ -19,7 +19,7 @@ namespace Solidify
 
             foreach (var item in archive.Entries.ToList())
             {
-                if (item.FullName.EndsWith(".html") && !item.FullName.Contains("_desc") && regex.IsMatch(item.Name))
+                if (item.FullName.EndsWith(".html") && !item.Name.Contains("_desc") && (regex.IsMatch(item.Name) || item.Name == "solutions.html"))
                 {
                     await SaveEntryAsMarkdownAsync(item, saveRoot);
                 }
@@ -97,6 +97,10 @@ namespace Solidify
                     
                     case "br":
                         builder.Append('\n');
+                        break;
+                    
+                    case "hr":
+                        builder.Append("\n--------\n");
                         break;
 
                     case "sup":

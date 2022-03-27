@@ -21,10 +21,10 @@ namespace Solidify
         {
             if (fileName.Contains("_answ") || fileName.Contains("_disc") || fileName.Contains("_tran"))
             {
-                return fileName.Replace("html", "md");
+                return CreatePathSafeName(fileName.Replace("html", "md"));
             }
 
-            return title + ".md";
+            return CreatePathSafeName(title + ".md");
         }
 
         public static void EnsureCreated(DirectoryInfo info)
